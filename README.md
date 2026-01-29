@@ -36,7 +36,7 @@ I created a **Metric Filter** to detect degraded service states before users rep
 * **Threshold:** Trigger ALARM if errors > 5 within 1 minute.
 * **Outcome:** The system automatically transitions to an ALARM state during high error rates, enabling rapid incident response.
 
-![Alarm Configuration](alarm-state.png)
+<img width="962" height="232" alt="5  Alarm State - History" src="https://github.com/user-attachments/assets/35fbdc62-1b5f-45a5-8156-7edd91a7d8f6" />
 
 ### 3. Business Intelligence Dashboard
 I built a "Single Pane of Glass" dashboard to visualize traffic patterns for the Operations team.
@@ -45,7 +45,9 @@ I built a "Single Pane of Glass" dashboard to visualize traffic patterns for the
     * **Top Cities:** Grid view of cities with the highest engagement.
     * **Order Volume:** Bar chart tracking revenue-generating clicks.
 
-![Operational Dashboard](dashboard-full.png)
+<img width="1438" height="679" alt="10  CloudWatch - Widgets - 1" src="https://github.com/user-attachments/assets/121d0cb4-4edd-4717-b473-e5bc107e4d77" />
+
+<img width="1436" height="738" alt="11  CloudWatch - Widgets - 2" src="https://github.com/user-attachments/assets/47181a1c-1d2b-4663-bbde-e60d059e5667" />
 
 ---
 
