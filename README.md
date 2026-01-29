@@ -71,6 +71,17 @@ Evidence: The logs proved that while users were trying to access the menu, the s
 
 Business Impact: This error was the direct cause of the 100% drop in sales revenue.
 
+<img width="1208" height="224" alt="9  root-cause-500-error" src="https://github.com/user-attachments/assets/72561244-ecda-41d5-ad1b-a9a6fad448be" />
+---
+
+## 📂 Data Governance & Archival
+To ensure audit compliance and long-term data retention, I implemented an automated archival strategy.
+* **Mechanism:** All raw `access_log` files are automatically offloaded from the EC2 instance to **Amazon S3**.
+* **Storage Class:** S3 Standard (for high durability).
+* **Benefit:** Decouples storage from compute, allowing the EC2 instance to be terminated without losing historical data.
+  
+---
+
 🚀 Conclusion & Recommendations
 This project demonstrated that "Green" infrastructure status lights can be misleading. While the server (EC2) was healthy, the application was failing.
 
