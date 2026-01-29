@@ -11,7 +11,8 @@ The system successfully transformed raw Apache web server logs into real-time da
 ---
 
 ## 🏗 System Architecture
-![System Architecture](Hybrid Architectural Diagram_Suganya Ravindran.jpg)
+
+<img width="1408" height="768" alt="Hybrid Architectural Diagram_Suganya Ravindran" src="https://github.com/user-attachments/assets/c493e842-34bf-4c86-be5f-01eb0a385bba" />
 
 ### Architecture Highlights:
 * **Data Source:** Amazon EC2 instance hosting a PHP web application.
