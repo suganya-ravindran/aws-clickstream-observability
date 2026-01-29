@@ -1,50 +1,78 @@
-# Café Clickstream Analytics & Observability
+# Café Clickstream Analytics & Observability Case Study
 
 ## 📌 Project Overview
-Deployed a full-stack observability solution for a web application running on **Amazon EC2**. The goal was to translate raw server logs into actionable business intelligence and real-time operational alerts.
+**Role:** Cloud Engineer  
+**Environment:** AWS (EC2, CloudWatch, S3)
 
-**Role:** Cloud Engineer (Simulation)
-**Technologies:** AWS CloudWatch, EC2, Systems Manager, S3, Linux (Apache).
+In this project, I engineered a full-stack observability solution for a web application ("The Café"). The objective was to move beyond basic server monitoring (CPU/RAM) and implement **business-level intelligence** to track user behavior, geographic traffic, and revenue impact.
 
----
-
-## 🏗 Architecture
-![Architecture Diagram](architecture-diagram.jpg)
-*Designed a custom log ingestion pipeline moving data from EC2 -> CloudWatch Agent -> CloudWatch Logs -> S3 Archival.*
+The system successfully transformed raw Apache web server logs into real-time dashboards and uncovered a critical application failure that was silently causing 100% revenue loss.
 
 ---
 
-## 🔧 Implementation Highlights
+## 🏗 System Architecture
+![System Architecture](Hybrid Architectural Diagram_Suganya Ravindran.jpg)
 
-### 1. Custom Log Ingestion
-Configured the `amazon-cloudwatch-agent` on a Linux server to capture custom Apache access logs (`/var/log/www/access/access_log`).
-- **Challenge:** The default metrics (CPU/RAM) were insufficient for tracking user behavior.
-- **Solution:** Configured the agent to parse standard HTTP log formats to extract `RemoteIP`, `RequestURL`, and `Status` codes.
+### Architecture Highlights:
+* **Data Source:** Amazon EC2 instance hosting a PHP web application.
+* **Ingestion:** **Amazon CloudWatch Agent** configured to capture and parse custom application logs (`access_log`).
+* **Analysis:** CloudWatch Logs Insights used for ad-hoc SQL-style queries.
+* **Archival:** Amazon S3 bucket for long-term audit compliance.
 
-### 2. Operational Monitoring (Alarms)
-Created a "404 Error" metric filter to detect broken links or scanning attempts.
-- **Threshold:** > 5 errors within 1 minute.
-- **Action:** CloudWatch Alarm triggers immediately, allowing for rapid incident response.
-![Alarm Config](alarm-state.png)
+---
+
+## 🔧 Implementation Steps
+
+### 1. Custom Log Ingestion Strategy
+The default monitoring only provided infrastructure metrics. To gain application visibility, I:
+* Installed the **CloudWatch Agent** on the Linux server.
+* Configured the agent to stream `/var/log/www/access/access_log` to a custom Log Group (`apache/access`).
+* Parsed HTTP fields (`RemoteIP`, `RequestURL`, `Status Code`) to enable granular filtering.
+
+### 2. Automated Alerting (Operational Excellence)
+I created a **Metric Filter** to detect degraded service states before users reported them.
+* **Metric:** `404-Errors` (Client-side errors).
+* **Threshold:** Trigger ALARM if errors > 5 within 1 minute.
+* **Outcome:** The system automatically transitions to an ALARM state during high error rates, enabling rapid incident response.
+
+![Alarm Configuration](alarm-state.png)
 
 ### 3. Business Intelligence Dashboard
-Built a "Single Pane of Glass" dashboard for the operations team, visualizing:
-- **Traffic by Region** (Geolocation analysis).
-- **Top Cities** by order volume.
-- **Real-time Order Count**.
-![Dashboard](dashboard-full.png)
+I built a "Single Pane of Glass" dashboard to visualize traffic patterns for the Operations team.
+* **Widgets Created:**
+    * **Geographic Map:** Visualizing user traffic by Region/Country.
+    * **Top Cities:** Grid view of cities with the highest engagement.
+    * **Order Volume:** Bar chart tracking revenue-generating clicks.
+
+![Operational Dashboard](dashboard-full.png)
 
 ---
 
 ## 🔍 Critical Discovery: Root Cause Analysis
-During the final business review, the dashboard showed high traffic to the Menu page but **zero purchases**.
+During the final business review, the dashboard showed high traffic to the website but **zero completed orders**. This anomaly required a deep-dive forensic analysis.
 
-Using **CloudWatch Logs Insights**, I ran the following query to investigate the user journey:
+Using **CloudWatch Logs Insights**, I wrote the following query to investigate the user journey on the Menu page:
 
 ```sql
-fields @timestamp, status, request
+fields @timestamp, status, request, remoteIP
 | filter request = "/cafe/menu.php"
 | filter status = "500"
 | sort @timestamp desc
+| limit 20
+```
+The Findings:
 
-Result: The query confirmed that the application was failing with HTTP 500 Internal Server Errors, preventing users from viewing the menu. This analysis identified the specific PHP file (menu.php) responsible for 100% of the revenue loss.
+The query confirmed that the application was failing with HTTP 500 Internal Server Errors specifically on the /cafe/menu.php page.
+
+Evidence: The logs proved that while users were trying to access the menu, the server was rejecting requests, preventing any items from being added to the cart.
+
+Business Impact: This error was the direct cause of the 100% drop in sales revenue.
+
+🚀 Conclusion & Recommendations
+This project demonstrated that "Green" infrastructure status lights can be misleading. While the server (EC2) was healthy, the application was failing.
+
+Recommendations provided to the team:
+
+Immediate Fix: Developers must patch menu.php to resolve the 500 errors.
+
+Process Improvement: Configure Amazon SNS notifications to email the DevOps team immediately when HTTP 500 errors are detected, reducing Mean Time to Resolution (MTTR).
